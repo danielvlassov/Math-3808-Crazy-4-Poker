@@ -1,6 +1,6 @@
 import { Game } from "../core/Game";
 import CardImg from "./CardImg";
-import { evaluateBest4of5 } from "../core/HandEvaluator";
+import { safeEvaluateBest4of5, evaluateBest4of5 } from "../core/HandEvaluator";
 import { HandRank } from "../core/HandRank";
 import { Rank } from "../core/Card";
 
@@ -33,7 +33,7 @@ export default function Table({ game, hideDealer, showRanks, showDealerRank }: P
         const player = game.players[idx];
         // Determine evaluation only when 5 cards dealt
         const isComplete = player.hand.length === 5;
-        const evalRes = isComplete ? evaluateBest4of5(player.hand) : null;
+        const evalRes = isComplete ? safeEvaluateBest4of5(player.hand) : null;
         // Show rank for player vs dealer
         const showRank = idx === 0 ? showRanks : showDealerRank;
 

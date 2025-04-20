@@ -29,8 +29,31 @@ export class Game {
 
   settleRound(bets: { ante: number; queensUp: number; play: number }): RoundResult {
     const [player, dealer] = this.players;
-    const pEval = evaluateBest4of5(player.hand);
-    const dEval = evaluateBest4of5(dealer.hand);
+
+    if (player.hand.length !== 5 || dealer.hand.length !== 5) {
+      // Incomplete deal has to return a no‑op RoundResult
+      return {
+        summary: "Incomplete hands, round skipped [DEBUG].",
+        delta: 0,
+        breakdown: { ante: 0, play: 0, superBonus: 0, queensUp: 0 },
+      };
+    }
+
+    let pEval, dEval;
+
+    try {
+      pEval = evaluateBest4of5(player.hand);
+      dEval = evaluateBest4of5(dealer.hand);
+    } catch (err) {
+      // If something still goes wrong, bail out gracefully
+      console.error("Evaluation error in settleRound:", err);
+      return {
+        summary: "Error evaluating hands, round skipped [DEBUG].",
+        delta: 0,
+        breakdown: { ante: 0, play: 0, superBonus: 0, queensUp: 0 },
+      };
+    }
+
     const dealerQualifies = dEval.rank > HandRank.HighCard || (dEval.rank === HandRank.HighCard && dEval.ranks[0] >= Rank.King);
 
     const diff = beats(pEval, dEval);

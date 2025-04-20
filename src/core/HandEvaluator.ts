@@ -7,6 +7,15 @@ export interface EvalResult {
   ranks: number[];
 }
 
+export function safeEvaluateBest4of5(cards: Card[]): EvalResult | null {
+  if (cards.length !== 5) return null;
+  try {
+    return evaluateBest4of5(cards);
+  } catch {
+    return null;
+  }
+}
+
 export function evaluateBest4of5(cards: Card[]): EvalResult {
   if (cards.length !== 5) throw new Error("Hand must have 5 cards");
   let best: EvalResult | null = null;
