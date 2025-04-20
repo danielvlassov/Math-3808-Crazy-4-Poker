@@ -79,7 +79,7 @@ export class Game {
     else playPL = -playStake; // lose
 
     // Super Bonus P/L
-    const sbStake = playStake;
+    const sbStake = ante;
     const sbHigh = pEval.rank >= HandRank.Straight;
     let sbPL: number;
     if (sbHigh) sbPL = sbStake * superBonusTable[pEval.rank];
