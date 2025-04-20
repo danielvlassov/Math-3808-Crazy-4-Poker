@@ -63,8 +63,8 @@ export default function Table({ game, hideDealer, showRanks, showDealerRank }: P
                       // find the paired rank
                       const counts: Record<number,number> = {};
                       evalRes.ranks.forEach(r => counts[r] = (counts[r]||0) + 1);
-                      const pairRank = Number(Object.keys(counts).find(r => counts[+r] === 2));
-                      return `Pair of ${Rank[pairRank]}s`;
+                      // const pairRank = Number(Object.keys(counts).find(r => counts[+r] === 2)); old
+                      return `Pair of ${Rank[evalRes.ranks[0]]}s`;
                     })()
                   : rankLabel[evalRes.rank]}
               </span>
