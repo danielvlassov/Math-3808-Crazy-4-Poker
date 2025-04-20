@@ -66,16 +66,13 @@ function eval4(cs: Card[]): EvalResult {
     return { rank: HandRank.ThreeKind, ranks: [threeRank, ...kickers] };
   }
 
-  // Two Pair
-  if (Object.keys(counts).length === 2) {
-    // exactly two distinct ranks => either four‐kind (handled above) or two‐pair
-    const pairRanks = Object.entries(counts)
+  // Two Pair (2,2 freqs, kicker is decided by the lower pair)
+  if (freqs[0] === 2 && freqs[1] === 2) {
+    const pairs = Object.entries(counts)
       .filter(([, c]) => c === 2)
       .map(([r]) => Number(r))
       .sort((a, b) => b - a);
-    // the singleton kicker
-    const kicker = Number(Object.entries(counts).find(([, c]) => c === 1)![0]);
-    return { rank: HandRank.TwoPair, ranks: [...pairRanks, kicker] };
+    return { rank: HandRank.TwoPair, ranks: pairs };
   }
 
   // Pair
