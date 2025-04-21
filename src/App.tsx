@@ -102,7 +102,7 @@ export default function App() {
       <div className="flex items-center gap-4 mb-4">
         {adminPeek && (
           <div className="text-xs bg-black/40 px-2 py-1 rounded">
-        Admin Mode: dealer cards & hand rank visible.
+            Admin Mode: dealer cards & hand rank visible.
           </div>
         )}
         <div className="text-xs bg-black/40 px-2 py-1 rounded">
@@ -115,15 +115,14 @@ export default function App() {
         <div className="flex-1 flex flex-col items-center gap-8">
           <Table game={game} hideDealer={phase === "dealt" && !adminPeek} showRanks={phase !== "ready"} showDealerRank={phase === "result" || adminPeek} />
           {phase === "result" && result ? (
-            // Result breakdown table
+            // Redeal
             <div className="flex flex-col items-center gap-6">
-
-              <div className="bg-black/40 p-4 rounded-lg max-w-md w-full">
-                <pre className="whitespace-pre-wrap text-xl font-mono text-center">
-                {result.summary.split("\n")[0]}
-                </pre>
-              </div>
-
+              <button
+                onClick={redeal}
+                className="mt-4 px-10 py-4 bg-yellow-500 text-black rounded-lg text-3xl shadow-md hover:bg-yellow-600"
+              >
+                Redeal
+              </button>
               <div className="bg-black/40 p-6 rounded-lg max-w-md w-full">
                 <table className="w-full table-auto text-2xl border-collapse">
                   <thead>
@@ -170,13 +169,13 @@ export default function App() {
                   </tfoot>
                 </table>
               </div>
-              <button
-                onClick={redeal}
-                className="mt-4 px-10 py-4 bg-yellow-500 text-black rounded-lg text-3xl shadow-md hover:bg-yellow-600"
-              >
-                Redeal
-              </button>
+              <div className="bg-black/40 p-4 rounded-lg max-w-md w-full">
+                <pre className="whitespace-pre-wrap text-xl font-mono text-center">
+                  {result.summary.split("\n")[0]}
+                </pre>
+              </div>
             </div>
+
           ) : (
             <BetPanel phase={phase === "ready" ? "ready" : "dealt"} bets={bets} setBets={setBets} onDeal={deal} onPlay={play} onFold={fold} onTriple={tripleDown} canTriple={canTriple} />
           )}
