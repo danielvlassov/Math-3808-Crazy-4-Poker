@@ -80,7 +80,7 @@ export default function App() {
       game.dealHands();
     }
 
-    //setPlayerRank(evaluateBest4of5(game.players[0].hand).rank);
+    setPlayerRank(evaluateBest4of5(game.players[0].hand).rank);
     setBets((b) => ({ ...b, play: b.ante }));
     setPhase("dealt");
     rerender();
@@ -88,6 +88,7 @@ export default function App() {
 
   const play = () => {
     const res = game.settleRound({ ante: bets.ante, queensUp: bets.queensUp, play: bets.play });
+    setPlayerRank(evaluateBest4of5(game.players[0].hand).rank);
     setResult(res);
     setBankroll(b => b + res.delta);
     setPhase("result");
