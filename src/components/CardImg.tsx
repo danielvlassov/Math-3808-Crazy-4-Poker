@@ -7,7 +7,7 @@ interface CardImgProps {
   className?: string;
 }
 
-export default function CardImg({ card, faceDown = false, placeholder = false, className = ""}: CardImgProps) {
+export default function CardImg({ card, faceDown = false, placeholder = false}: CardImgProps) {
   // Ghost
   if (placeholder) {
     return (

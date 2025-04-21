@@ -1,5 +1,5 @@
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Game } from "../core/Game";
 import { Card } from "../core/Card";
 import CardImg from "./CardImg";

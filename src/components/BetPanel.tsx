@@ -109,6 +109,7 @@ export default function BetPanel({ phase, bets, setBets, onDeal, onPlay, onFold,
   );
 }
 
+/*
 function ChipInput({ label, amount, onChange, disabled }: { label: string; amount: number; onChange: (v: number) => void; disabled?: boolean }) {
   return (
     <div className="flex flex-col gap-1 items-center">
@@ -124,3 +125,4 @@ function ChipInput({ label, amount, onChange, disabled }: { label: string; amoun
     </div>
   );
 }
+  */

@@ -1,4 +1,3 @@
-import React from "react";
 import { Card, Suit, Rank } from "../core/Card";
 import CardImg from "./CardImg";
 

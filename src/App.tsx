@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Game, RoundResult } from "./core/Game";
 import { evaluateBest4of5 } from "./core/HandEvaluator";
 import { HandRank } from "./core/HandRank";
