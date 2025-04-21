@@ -11,9 +11,10 @@ interface Props {
   onFold: () => void;
   onTriple: () => void;
   canTriple: boolean;
+  disableDeal?: boolean;
 }
 
-export default function BetPanel({ phase, bets, setBets, onDeal, onPlay, onFold, onTriple, canTriple }: Props) {
+export default function BetPanel({ phase, bets, setBets, onDeal, onPlay, onFold, onTriple, canTriple, disableDeal = false }: Props) {
   const lock = phase !== "ready";
   return (
     <Card className="relative bg-white text-black shadow-2xl w-full max-w-lg">
@@ -43,15 +44,44 @@ export default function BetPanel({ phase, bets, setBets, onDeal, onPlay, onFold,
         {/* action buttons */}
         <div className="flex flex-wrap justify-center gap-6">
           {phase === "ready" ? (
-            <Button size="lg" className="px-12 text-xl" onClick={onDeal}>Deal</Button>
+            <Button
+              size="lg"
+              className="px-12 text-xl"
+              onClick={onDeal}
+              disabled={disableDeal}
+            >
+              Deal
+            </Button>
           ) : (
             <>
-              <Button variant="secondary" size="lg" className="px-10 text-xl bg-green-600 text-white hover:bg-green-700" onClick={onPlay}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="px-10 text-xl bg-green-600 text-white hover:bg-green-700"
+                onClick={onPlay}
+              >
                 Play ${bets.play}
               </Button>
-              <Button variant="destructive" size="lg" className="px-10 text-xl hover:bg-red-700" onClick={onFold}>Fold</Button>
-              <Button variant="outline" size="lg" className={canTriple ? "px-10 text-xl bg-purple-600 text-white animate-pulse" : "px-10 text-xl opacity-50 cursor-not-allowed"} onClick={onTriple} disabled={!canTriple}>
-              Triple Down{canTriple ? ` $${bets.play * 3}` : ""}
+              <Button
+                variant="destructive"
+                size="lg"
+                className="px-10 text-xl hover:bg-red-700"
+                onClick={onFold}
+              >
+                Fold
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className={
+                  canTriple
+                    ? "px-10 text-xl bg-purple-600 text-white animate-pulse"
+                    : "px-10 text-xl opacity-50 cursor-not-allowed"
+                }
+                onClick={onTriple}
+                disabled={!canTriple}
+              >
+                Triple Down{canTriple ? ` $${bets.play * 3}` : ""}
               </Button>
             </>
           )}

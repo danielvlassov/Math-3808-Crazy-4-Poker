@@ -3,9 +3,11 @@ import { Game, RoundResult } from "./core/Game";
 import { evaluateBest4of5 } from "./core/HandEvaluator";
 import { HandRank } from "./core/HandRank";
 import { Rank } from "./core/Card";
+import { Card } from "./core/Card";
 import Table from "./components/Table";
 import BetPanel from "./components/BetPanel";
 import OddsSidebar from "./components/OddsSidebar";
+import CardPicker, { PlayingCard } from "./components/CardPicker";
 import seedrandom from "seedrandom";
 
 interface Bets {
@@ -22,9 +24,13 @@ export default function App() {
   const [bankroll, setBankroll] = useState(1000);
   const [playerRank, setPlayerRank] = useState<HandRank | null>(null);
   const [adminPeek, setAdminPeek] = useState(false);
-  const rerender = useCallback(() => force((x) => x + 1), []);
   const [result, setResult] = useState<RoundResult | null>(null);
+  const [deterministic, setDeterministic] = useState(false);
+  const [customs, setCustoms] = useState<Record<string, PlayingCard>>({});
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerSlot, setPickerSlot] = useState<{ p: 0 | 1; i: number } | null>(null);
 
+  const rerender = useCallback(() => force((x) => x + 1), []);
 
   const canTriple: boolean =
     phase === "dealt" &&
@@ -41,10 +47,40 @@ export default function App() {
       return false;
     })();
 
+
+  // click on a “?” placeholder
+  function onPick(p: 0 | 1, i: number) {
+    setPickerSlot({ p, i });
+    setPickerOpen(true);
+  }
+
+  function onChosen(c: PlayingCard) {
+    if (!pickerSlot) return;
+    const key = `${pickerSlot.p}-${pickerSlot.i}`;
+    setCustoms(cs => ({ ...cs, [key]: c }));
+    setPickerOpen(false);
+    setPickerSlot(null);
+  }
+
+  // Deal is disabled until 10 cards chosen:
+  const allFilled = Object.keys(customs).length === 10;
+  const disableDeal = deterministic && !allFilled;
+
   const deal = () => {
-    game.shuffle(seedrandom());
-    game.dealHands();
-    setPlayerRank(evaluateBest4of5(game.players[0].hand).rank);
+    if (deterministic) {
+      game.players.forEach((pl, pi) => {
+        pl.hand.length = 0;
+        for (let j = 0; j < 5; j++) {
+          const { suit, rank } = customs[`${pi}-${j}`]!;
+          pl.add(new Card(suit, rank));
+        }
+      });
+    } else {
+      game.shuffle(seedrandom());
+      game.dealHands();
+    }
+
+    //setPlayerRank(evaluateBest4of5(game.players[0].hand).rank);
     setBets((b) => ({ ...b, play: b.ante }));
     setPhase("dealt");
     rerender();
@@ -88,21 +124,39 @@ export default function App() {
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-gradient-to-b from-green-900 to-black text-white p-6">
-      <h1 className="text-5xl font-bold mb-4 tracking-wide">Crazy 4 Poker</h1>
+      <h1 className="text-5xl font-bold mb-4 tracking-wide">Crazy 4 Poker</h1>
 
       <div className="flex items-center gap-4 text-2xl font-mono mb-6">
         Bankroll: ${bankroll}
         <button onClick={() => setBankroll((b) => b + 500)} className="bg-white text-black px-3 py-1 rounded shadow">
           +500
         </button>
-        <label className="flex items-center gap-2 text-sm ml-4">
+        <label className="flex items-center gap-2 text-lg ml-4">
           <input type="checkbox" checked={adminPeek} onChange={(e) => setAdminPeek(e.target.checked)} /> Admin Mode
         </label>
+
+        <label className="flex items-center gap-2 text-lg ml-4">
+          <input
+            type="checkbox"
+            checked={deterministic}
+            onChange={e => {
+              setDeterministic(e.target.checked);
+              setCustoms({}); // clear old picks
+            }}
+          />{" "}
+          Deterministic Mode
+        </label>
+
       </div>
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-4 mb-6">
         {adminPeek && (
           <div className="text-xs bg-black/40 px-2 py-1 rounded">
             Admin Mode: dealer cards & hand rank visible.
+          </div>
+        )}
+        {deterministic && (
+          <div className="text-xs bg-black/40 px-2 py-1 rounded">
+            Click any “?” or existing card to assign a value.
           </div>
         )}
         <div className="text-xs bg-black/40 px-2 py-1 rounded">
@@ -113,7 +167,7 @@ export default function App() {
       <div className="flex w-full max-w-7xl mx-auto justify-center gap-10">
         <OddsSidebar rank={phase === "result" ? playerRank : null} />
         <div className="flex-1 flex flex-col items-center gap-8">
-          <Table game={game} hideDealer={phase === "dealt" && !adminPeek} showRanks={phase !== "ready"} showDealerRank={phase === "result" || adminPeek} />
+          <Table game={game} hideDealer={phase === "dealt" && !adminPeek} showRanks={phase !== "ready"} showDealerRank={phase === "result" || adminPeek} deterministic={deterministic} customCards={customs} onPickPlaceholder={onPick} />
           {phase === "result" && result ? (
             // Redeal
             <div className="flex flex-col items-center gap-6">
@@ -177,10 +231,18 @@ export default function App() {
             </div>
 
           ) : (
-            <BetPanel phase={phase === "ready" ? "ready" : "dealt"} bets={bets} setBets={setBets} onDeal={deal} onPlay={play} onFold={fold} onTriple={tripleDown} canTriple={canTriple} />
+            <BetPanel phase={phase === "ready" ? "ready" : "dealt"} bets={bets} setBets={setBets} onDeal={deal} onPlay={play} onFold={fold} onTriple={tripleDown} canTriple={canTriple} disableDeal={disableDeal} />
           )}
         </div>
       </div>
+
+      {pickerOpen && pickerSlot && (
+        <CardPicker
+          existing={Object.values(customs)}
+          onSelect={onChosen}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
     </main>
   );
 }

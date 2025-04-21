@@ -4,9 +4,10 @@ interface CardImgProps {
   card?: Card;
   faceDown?: boolean;
   placeholder?: boolean;
+  className?: string;
 }
 
-export default function CardImg({ card, faceDown = false, placeholder = false }: CardImgProps) {
+export default function CardImg({ card, faceDown = false, placeholder = false, className = ""}: CardImgProps) {
   // Ghost
   if (placeholder) {
     return (
